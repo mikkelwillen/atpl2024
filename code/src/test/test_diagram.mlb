@@ -1,5 +1,0 @@
-local $(SML_LIB)/basis/basis.mlb
-      ../diagram.sml
-in
-  test_diagram.sml
-end
