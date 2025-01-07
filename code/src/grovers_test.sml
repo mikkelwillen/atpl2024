@@ -10,4 +10,4 @@ fun run c k =
      print (pp_dist(measure_dist(eval c (init k))) ^ "\n\n"))
 
 
-val () = run ((C (C (C Z)))) (ket[1,1,1,1])
+val () = run (groversNaive 3 4) (ket[0,0,0,0,0])
