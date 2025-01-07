@@ -74,7 +74,8 @@ structure Semantics :> SEMANTICS = struct
                             [1,0]]
            | Y => M.fromListList [[c0,cni],
                                   [ci,c0]]
-           | Z => fromIntM [[1,0],[0,~1]]
+           | Z => fromIntM [[1,0],
+                            [0,~1]]
            | H => let val rsqrt2 = C.fromRe (1.0 / Math.sqrt 2.0)
                   in M.fromListList [[rsqrt2,rsqrt2],
                                      [rsqrt2,C.~ rsqrt2]]
