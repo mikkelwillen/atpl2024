@@ -105,5 +105,3 @@ structure Grovers : GROVERS = struct
 		end
 
 end
-
-(* hvordan bruger man ancilla bits i mlkit? *)
