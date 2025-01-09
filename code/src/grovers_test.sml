@@ -9,5 +9,4 @@ fun run c k =
      print ("Result distribution when evaluating c on " ^ pp_ket k ^ " :\n");
      print (pp_dist(measure_dist(eval c (init k))) ^ "\n\n"))
 
-
-val () = run (groversNaive 3 4) (ket[0,0,0,0,0])
+val () = run (groversNaive 3 4) (initKet 4 1)

@@ -1,14 +1,15 @@
 structure Grovers : GROVERS = struct
 
 	open Circuit
+	open Semantics
 
-    val oo = op Seq
+	val oo = op Seq
 	val ** = op Tensor
 
 	infix oo
 	infix **
-    infix div
-    infix mod
+	infix div
+	infix mod
 
 	(* integer power *)
 	fun powInt 0 y = 0
@@ -35,7 +36,7 @@ structure Grovers : GROVERS = struct
 	fun cxNot 1 = X
 	  | cxNot n = C (cxNot (n - 1))
 
-    (* helper function for flipping the bits so that the target qubit is |1..1> *)
+	(* helper function for flipping the bits so that the target qubit is |1..1> *)
 	fun flipBits n numQubits : t =
 		if (n > (powInt 2 numQubits) - 1) then
 			raise Fail ("does not work" ^ (Int.toString n))
@@ -58,6 +59,13 @@ structure Grovers : GROVERS = struct
 				(flipBits (n div 2) (numQubits - 1)) ** X
 			else
 				(flipBits (n div 2) (numQubits - 1)) ** I
+
+	(* function for initializing the state to |0..0> with `n` bits and `m`ancilla bits *)
+    fun initKets n m : ket =
+		let val numQubits = n + m
+		in
+			ket (zero numQubits)
+		end
 
 	(* oracleNaive function
 		- `n` is the target value
@@ -94,11 +102,11 @@ structure Grovers : GROVERS = struct
 		- returns a circuit that applies the grovers algorithm to the input state *)
 	fun groversNaive n inputNumQubits : t =
 		let val numQubits = inputNumQubits + 1
-            val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 numQubits)))
+			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 numQubits)))
 			val hadamardGates = hadamard numQubits
 			val initAncilla = zAncilla numQubits
 			val oracle = oracleNaive n numQubits
-		    val diffusion = diffusionNaive n numQubits
+			val diffusion = diffusionNaive n numQubits
 			val repetition = repeatN (oracle oo diffusion) iterations
 		in
 			hadamardGates oo initAncilla oo repetition
