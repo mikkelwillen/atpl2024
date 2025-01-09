@@ -6,8 +6,8 @@ structure Grovers : GROVERS = struct
 	val oo = op Seq
 	val ** = op Tensor
 
-	infix oo
-	infix **
+	infix 3 oo
+	infix 4 **
 	infix div
 	infix mod
 
@@ -60,11 +60,19 @@ structure Grovers : GROVERS = struct
 			else
 				(flipBits (n div 2) (numQubits - 1)) ** I
 
+    (* from: https://gist.github.com/edalorzo/4670775 *)
+	(* Replicates an element x a number of n times and returns a list. *)
+	fun replicate(x, n) =
+		if n < 1 then
+			[]
+		else
+			x::replicate(x, n-1)
+
 	(* function for initializing the state to |0..0> with `n` bits and `m`ancilla bits *)
     fun initKets n m : ket =
 		let val numQubits = n + m
 		in
-			ket (zero numQubits)
+			ket (replicate(0, numQubits))
 		end
 
 	(* oracleNaive function
@@ -86,30 +94,65 @@ structure Grovers : GROVERS = struct
 	fun diffusionNaive n numQubits : t =
 		hadamardI numQubits oo notI numQubits oo cxNot numQubits oo notI numQubits oo hadamardI numQubits
 
-	(* repeatN function that repeats the circuit `t` `n` times *)
-	fun repeatN t n =
+	(* repeatCircuit function that repeats the circuit `t` `n` times *)
+	fun repeatCircuit t n =
 		if n < 1 then
 			raise Fail "Number of iterations must be greater than 0"
 		else if n = 1 then
 			t
 		else
-			t oo repeatN t (n - 1)
+			t oo repeatCircuit t (n - 1)
 
 	(* groversNaive function
 		- `n` is the target value
 		- `numQubits` is the number of qubits in the circuit
 
 		- returns a circuit that applies the grovers algorithm to the input state *)
-	fun groversNaive n inputNumQubits : t =
+	fun groversNaive n inputNumQubits : t * ket =
 		let val numQubits = inputNumQubits + 1
-			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 numQubits)))
+			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
 			val hadamardGates = hadamard numQubits
 			val initAncilla = zAncilla numQubits
 			val oracle = oracleNaive n numQubits
 			val diffusion = diffusionNaive n numQubits
-			val repetition = repeatN (oracle oo diffusion) iterations
+			val repetition = repeatCircuit (oracle oo diffusion) iterations
 		in
-			hadamardGates oo initAncilla oo repetition
+			(hadamardGates oo initAncilla oo repetition, initKets inputNumQubits 1)
 		end
 
+
+	(* grover function, where the oracle is given as a function *)
+	(* groversOracleFun function
+		- `oracle` is the oracle function
+		- `numQubits` is the number of qubits in the circuit
+
+		- returns a circuit that applies the grovers algorithm to the input state *)
+	fun groversOracleFun oracle inputNumQubits : t * ket =
+		let val numQubits = inputNumQubits + 1
+			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
+			val hadamardGates = hadamard numQubits
+			val initAncilla = zAncilla numQubits
+			val oracleCircuit = oracle numQubits
+			val diffusion = diffusionNaive 0 numQubits
+			val repetition = repeatCircuit (oracleCircuit oo diffusion) iterations
+		in
+			(hadamardGates oo initAncilla oo repetition, initKets inputNumQubits 1)
+		end
+
+	(* grover function, where the oracle is given as a circuit *)
+	(* groversOracleCircuit function
+		- `oracle` is the oracle circuit
+		- `numQubits` is the number of qubits in the circuit
+
+		- returns a circuit that applies the grovers algorithm to the input state *)
+	fun groversOracleCircuit oracle inputNumQubits : t * ket =
+		let val numQubits = inputNumQubits + 1
+			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
+			val hadamardGates = hadamard numQubits
+			val initAncilla = zAncilla numQubits
+			val diffusion = diffusionNaive 0 numQubits
+			val repetition = repeatCircuit (oracle oo diffusion) iterations
+		in
+			(hadamardGates oo initAncilla oo repetition, initKets inputNumQubits 1)
+		end
 end

@@ -1,0 +1,4 @@
+local $(SML_LIB)/basis/basis.mlb
+   grovers.mlb
+in grovers_circuit_test.sml
+end

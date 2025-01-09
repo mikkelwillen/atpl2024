@@ -119,6 +119,23 @@ structure Semantics :> SEMANTICS = struct
   fun eval (x:Circuit.t) (v:state) : state =
       M.matvecmul_gen C.* C.+ (C.fromInt 0) (sem x) v
 
+  (* function for evalutating a circuit with ancilla qubits
+     ancilla bits are always added at the end.
+     Probabilities of ancilla qubits are added together *)
+  (* evalAncilla function
+     - x: circuit to evaluate
+     - v: state vector
+     - num_ancilla: number of ancilla qubits to add to the state vector
+
+     - returns: state vector with ancilla qubits added *)
+  fun evalAncilla (x: Circuit.t) (v: state) (num_ancilla: int) : state =
+      let mult = M.matvecmul_gen C.* C.+ (C.fromInt 0) (sem x) v
+          val n = pow2(num_ancilla)
+          val m = pow2(length v)
+          val v = Vector.tabulate(m * n,
+                                  fn i => if i < m then Vector.sub(mult,i)
+                                          else C.fromInt 0)
+
   (* Probability distributions *)
 
   type dist = (ket*real) vector

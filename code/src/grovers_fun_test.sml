@@ -9,4 +9,4 @@ fun run (c, k) =
      print ("Result distribution when evaluating c on " ^ pp_ket k ^ " :\n");
      print (pp_dist(measure_dist(eval c (init k))) ^ "\n\n"))
 
-val () = run (groversNaive 3 3)
+val () = run (groversOracleFun (oracleNaive 7) 3)
