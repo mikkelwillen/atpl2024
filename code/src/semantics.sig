@@ -17,6 +17,7 @@ sig
   type dist = (ket*real) vector
   val pp_dist      : dist -> string
   val measure_dist : state -> dist
+  val measure_dist_ancilla : state -> int -> dist
 
   val interp : Circuit.t -> state -> state
 end
