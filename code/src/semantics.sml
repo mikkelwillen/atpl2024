@@ -1,28 +1,29 @@
 structure Semantics :> SEMANTICS = struct
 
-  infix |> fun x |> f = f x
+    infix |> fun x |> f = f x
 
-  structure C = Complex
-  structure M = Matrix
+    structure C = Complex
+    structure M = Matrix
 
-  type complex = C.complex
-  type mat = C.complex M.t
+    type complex = C.complex
+    type mat = C.complex M.t
 
-  fun pp_c (c:complex) : string =
-      C.fmtBrief (StringCvt.GEN(SOME 4)) c
+    fun pp_c (c:complex) : string =
+        C.fmtBrief (StringCvt.GEN(SOME 4)) c
 
-  fun pp_r (r:real) =
-      let val s = Real.toString r
-      in if String.isSuffix ".0" s then String.extract(s,0,SOME(size s-2))
-         else s
-      end
+    fun pp_r (r:real) =
+        let val s = Real.toString r
+        in if String.isSuffix ".0" s then
+               String.extract(s,0,SOME(size s-2))
+           else s
+        end
 
-  fun pp_mat (m:mat) : string =
-      let val m = M.map pp_c m |> M.memoize
-          val sz = foldl (fn (e,a) => Int.max(a,size e)) 1
-                         (List.concat (M.listlist m))
-      in M.pp sz (fn x => x) m
-      end
+    fun pp_mat (m:mat) : string =
+        let val m = M.map pp_c m |> M.memoize
+            val sz = foldl (fn (e,a) => Int.max(a,size e)) 1
+                           (List.concat (M.listlist m))
+        in M.pp sz (fn x => x) m
+        end
 
   (* Semantics *)
   fun matmul (t1:mat,t2:mat) : mat =
