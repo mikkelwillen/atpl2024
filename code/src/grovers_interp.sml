@@ -6,8 +6,7 @@ infix 4 **
 fun run (c, k) =
     (print ("Circuit for c = " ^ pp c ^ ":\n");
      print (draw c ^ "\n");
-     print ("Semantics of c:\n" ^ pp_mat(sem c) ^ "\n");
      print ("Result distribution when evaluating c on " ^ pp_ket k ^ " :\n");
-     print (pp_dist(measure_dist_ancilla(eval c (init k)) 1) ^ "\n\n"))
+     print (pp_dist(measure_dist_ancilla(interp c (init k)) 1) ^ "\n\n"))
 
-val () = run (groversNaive 15 4)
+val () = run (groversNaive 31 5)

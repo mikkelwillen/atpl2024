@@ -83,7 +83,9 @@ structure Grovers : GROVERS = struct
 	fun oracleNaive n numQubits : t =
 		let val flip = (flipBits n (numQubits - 1)) ** I
 		in
-			flip oo cxNot numQubits oo flip
+			flip oo
+			cxNot numQubits oo
+			flip
 		end
 
 	(* diffusionNaive function
@@ -92,7 +94,11 @@ structure Grovers : GROVERS = struct
 
 		- returns a circuit that applies the diffusion operator to the input state *)
 	fun diffusionNaive n numQubits : t =
-		hadamardI numQubits oo notI numQubits oo cxNot numQubits oo notI numQubits oo hadamardI numQubits
+		hadamardI numQubits oo
+		notI numQubits oo
+		cxNot numQubits oo
+		notI numQubits oo
+		hadamardI numQubits
 
 	(* repeatCircuit function that repeats the circuit `t` `n` times *)
 	fun repeatCircuit t n =
@@ -110,7 +116,7 @@ structure Grovers : GROVERS = struct
 		- returns a circuit that applies the grovers algorithm to the input state *)
 	fun groversNaive n inputNumQubits : t * ket =
 		let val numQubits = inputNumQubits + 1
-			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
+			val iterations = Real.floor (Math.pi / 4.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
 			val hadamardGates = hadamard numQubits
 			val initAncilla = zAncilla numQubits
 			val oracle = oracleNaive n numQubits
@@ -129,7 +135,7 @@ structure Grovers : GROVERS = struct
 		- returns a circuit that applies the grovers algorithm to the input state *)
 	fun groversOracleFun oracle inputNumQubits : t * ket =
 		let val numQubits = inputNumQubits + 1
-			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
+			val iterations = Real.floor (Math.pi / 4.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
 			val hadamardGates = hadamard numQubits
 			val initAncilla = zAncilla numQubits
 			val oracleCircuit = oracle numQubits
@@ -147,7 +153,7 @@ structure Grovers : GROVERS = struct
 		- returns a circuit that applies the grovers algorithm to the input state *)
 	fun groversOracleCircuit oracle inputNumQubits : t * ket =
 		let val numQubits = inputNumQubits + 1
-			val iterations = Real.ceil (Math.pi / 8.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
+			val iterations = Real.floor (Math.pi / 4.0 * Math.sqrt (Real.fromInt (powInt 2 inputNumQubits)))
 			val hadamardGates = hadamard numQubits
 			val initAncilla = zAncilla numQubits
 			val diffusion = diffusionNaive 0 numQubits
