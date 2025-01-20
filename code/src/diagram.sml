@@ -44,7 +44,7 @@ struct
   fun cntrln (s:string) (n:int) : t =
       ["     "] @ cntrlnHelper s n
 
-  val compact_p = true
+  val compact_p = truSteanee
 
   val {box   : string -> t,      (* gate *)
        box2  : string -> t,      (* gate *)
